@@ -135,14 +135,17 @@ impl<A: Float + Zero + One, T: std::cmp::PartialEq, U: AsRef<[A]> + std::cmp::Pa
         self.right = Some(right);
     }
 
-    pub fn remove(&mut self, point: &U, data: &T) -> Result<usize, ErrorKind> {
+    pub fn remove<F>(&mut self, point: &U, data: &T, distance: &F) -> Result<usize, ErrorKind>
+    where
+        F: Fn(&[A], &[A]) -> bool,
+    {
         let mut removed = 0;
         self.check_point(point.as_ref())?;
         if let (Some(mut points), Some(mut bucket)) = (self.points.take(), self.bucket.take()) {
             while let Some(p_index) = points
                 .iter()
                 .zip(bucket.iter())
-                .position(|(p, d)| p == point && d == data)
+                .position(|(p, d)| distance(p.as_ref(), point.as_ref()) && d == data)
             {
                 points.remove(p_index);
                 bucket.remove(p_index);
@@ -153,14 +156,14 @@ impl<A: Float + Zero + One, T: std::cmp::PartialEq, U: AsRef<[A]> + std::cmp::Pa
             self.bucket = Some(bucket);
         } else {
             if let Some(right) = self.right.as_mut() {
-                let right_removed = right.remove(point, data)?;
+                let right_removed = right.remove(point, data, distance)?;
                 if right_removed > 0 {
                     self.size -= right_removed;
                     removed += right_removed;
                 }
             }
             if let Some(left) = self.left.as_mut() {
-                let left_removed = left.remove(point, data)?;
+                let left_removed = left.remove(point, data, distance)?;
                 if left_removed > 0 {
                     self.size -= left_removed;
                     removed += left_removed;

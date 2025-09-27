@@ -340,7 +340,7 @@ fn handles_remove_correctly() {
     kdtree.add(&item3.0, item3.1).unwrap();
     kdtree.add(&item4.0, item4.1).unwrap();
 
-    let num_removed = kdtree.remove(&&item3.0, &item3.1).unwrap();
+    let num_removed = kdtree.remove(&&item3.0, &item3.1, &|a, b| a == b).unwrap();
     assert_eq!(kdtree.size(), 3);
     assert_eq!(num_removed, 1);
     assert_eq!(
@@ -367,7 +367,7 @@ fn handles_remove_multiple_match() {
     kdtree.add(&item4.0, item4.1).unwrap();
 
     assert_eq!(kdtree.size(), 4);
-    let num_removed = kdtree.remove(&&[0f64], &1).unwrap();
+    let num_removed = kdtree.remove(&&[0f64], &1, &|a, b| a == b).unwrap();
     assert_eq!(kdtree.size(), 2);
     assert_eq!(num_removed, 2);
     assert_eq!(
@@ -393,7 +393,7 @@ fn handles_remove_no_match() {
     kdtree.add(&item3.0, item3.1).unwrap();
     kdtree.add(&item4.0, item4.1).unwrap();
 
-    let num_removed = kdtree.remove(&&[1f64], &2).unwrap();
+    let num_removed = kdtree.remove(&&[1f64], &2, &|a, b| a == b).unwrap();
     assert_eq!(kdtree.size(), 4);
     assert_eq!(num_removed, 0);
     assert_eq!(
@@ -411,7 +411,7 @@ fn handles_remove_overlapping_points() {
     kdtree.add(a.0, a.1).unwrap();
     kdtree.add(b.0, b.1).unwrap();
 
-    let num_removed = kdtree.remove(&[0f64, 0f64], &1).unwrap();
+    let num_removed = kdtree.remove(&[0f64, 0f64], &1, &|a, b| a == b).unwrap();
     assert_eq!(kdtree.size(), 1);
     assert_eq!(num_removed, 1);
     assert_eq!(
